@@ -1,11 +1,12 @@
 import sys
 import os
+import json
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from flask import Flask, request
+from flask import Flask, request, Response
 
 import tools.infer.predict_system as predict_sys
 import tools.infer.utility as utility
@@ -18,8 +19,12 @@ def hello_world():
 
 @app.route("/analyse", methods=['POST'])
 def analyse():
-  # print(request.get_json())
-  return "<p>Hello, World!</p>"
+  args = utility.parse_args()
+  # 获取图片base64参数
+  requestBody = request.json
+  args.base64Img = requestBody['base64Img']
+  result = predict_sys.analyse_image_web(args)
+  return Response(json.dumps(result),  mimetype='application/json')
 
 
 if __name__ == '__main__':
